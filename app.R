@@ -16,7 +16,6 @@ ui <- fluidPage(
       h1("Star Wars Characters"),
       h2("My app from scratch"),
       sliderInput(
-        
         inputId = "taille",
         label = "Height of Characters",
         min = 0,
@@ -27,6 +26,10 @@ ui <- fluidPage(
         inputId = "gender",
         label = "Choisir le genre des personnages",
         choices = c("masculine", "feminine")),
+      actionButton(
+        inputId = "boutton",
+        label = "Cliquez moi"
+      )
     ),
 
     
@@ -39,10 +42,17 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
-  output$StarWarsPlot <- renderPlot({
-  starwars |>
+  
+  rv <- reactiveValues()
+  
+  observeEvent(c(input$taille, input$gender),{
+    rv$starwars_filtrer <- starwars |>
       filter(height > input$taille) |>
-      filter(gender == input$gender) |>
+      filter(gender == input$gender)
+  })
+  
+  output$StarWarsPlot <- renderPlot({
+    rv$starwars_filtrer |>
       ggplot(aes(x = height))+
       geom_histogram(binwidth = 10,
                       fill ="white",
@@ -63,6 +73,17 @@ server <- function(input, output) {
     starwars |> 
       filter(height > input$taille) |>
       filter(gender == input$gender)
+  })
+  
+  observeEvent(input$boutton, {
+    message("vous avez cliqué sur un boutton")
+  })
+  
+  observeEvent(input$taille, {
+    showNotification(
+      glue("La taille recherchée est maintenant de {input$taille} cm"),
+      type = "message"
+    )
   })
 }
 
