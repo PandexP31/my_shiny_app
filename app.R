@@ -1,5 +1,7 @@
 library(shiny)
 library(dplyr)
+library(ggplot2)
+
 ui <- fluidPage(
   titlePanel("My First Shiny App"),
   sidebarLayout(
