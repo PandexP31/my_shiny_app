@@ -3,8 +3,13 @@ library(dplyr)
 library(ggplot2)
 library(glue)
 library(DT)
+library(bslib)
+library(thematic)
+
+thematic_shiny(font="auto")
 
 ui <- fluidPage(
+  theme = bs_theme(version = 5, bootswatch = "vapor"), 
   titlePanel("My First Shiny App"),
   sidebarLayout(
     sidebarPanel(
@@ -40,8 +45,8 @@ server <- function(input, output) {
       filter(gender == input$gender) |>
       ggplot(aes(x = height))+
       geom_histogram(binwidth = 10,
-                      fill ="darkgray",
-                      color ="white") +
+                      fill ="white",
+                      color ="black") +
       labs(title = glue("Vous avez sélectionné le genre : {input$gender}"))
   })
   
