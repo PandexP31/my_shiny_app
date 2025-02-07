@@ -1,6 +1,8 @@
 library(shiny)
 library(dplyr)
 library(ggplot2)
+library(glue)
+library(DT)
 
 ui <- fluidPage(
   titlePanel("My First Shiny App"),
@@ -9,15 +11,24 @@ ui <- fluidPage(
       h1("Star Wars Characters"),
       h2("My app from scratch"),
       sliderInput(
+        
         inputId = "taille",
         label = "Height of Characters",
         min = 0,
         max = 250,
         value = 30
-      )
+      ), 
+      selectInput(
+        inputId = "gender",
+        label = "Choisir le genre des personnages",
+        choices = c("masculine", "feminine")),
     ),
+
+    
     mainPanel(
-      plotOutput("StarWarsPlot")
+      textOutput("StarWarsTitle"),
+      plotOutput("StarWarsPlot"),
+      DTOutput("StarWarsTable")
     )
   )
 )
@@ -26,10 +37,27 @@ server <- function(input, output) {
   output$StarWarsPlot <- renderPlot({
   starwars |>
       filter(height > input$taille) |>
+      filter(gender == input$gender) |>
       ggplot(aes(x = height))+
       geom_histogram(binwidth = 10,
                       fill ="darkgray",
-                      color ="white")
+                      color ="white") +
+      labs(title = glue("Vous avez sélectionné le genre : {input$gender}"))
+  })
+  
+  output$StarWarsTitle <- renderText({
+    nb_lignes <- starwars |>
+      filter(height > input$taille) |>
+      filter(gender == input$gender) |>
+      nrow()
+    
+    glue("Nb de lignes selectionnés : {nb_lignes}")
+  })
+  
+  output$StarWarsTable <- renderDT({
+    starwars |> 
+      filter(height > input$taille) |>
+      filter(gender == input$gender)
   })
 }
 
